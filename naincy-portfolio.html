@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Naincy Rauniyar — Backend Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #111318;
+    --surface2: #181c24;
+    --border: rgba(255,255,255,0.07);
+    --accent: #00e5a0;
+    --accent2: #0099ff;
+    --accent-glow: rgba(0,229,160,0.15);
+    --text: #f0f2f5;
+    --muted: #6b7280;
+    --muted2: #9ca3af;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE TEXTURE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+  }
+
+  /* ── GRID BG ── */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── AMBIENT GLOW ── */
+  .glow-orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(120px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .glow-orb.g1 { width: 600px; height: 600px; background: rgba(0,229,160,0.06); top: -200px; right: -100px; }
+  .glow-orb.g2 { width: 500px; height: 500px; background: rgba(0,153,255,0.05); bottom: 200px; left: -150px; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 48px;
+    background: rgba(10,12,16,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.2rem;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+  }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a {
+    color: var(--muted2); text-decoration: none; font-size: 0.85rem;
+    font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* ── SECTIONS ── */
+  section { position: relative; z-index: 1; }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    display: flex; align-items: center;
+    padding: 120px 48px 80px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .hero-inner { max-width: 780px; }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(0,229,160,0.08); border: 1px solid rgba(0,229,160,0.2);
+    color: var(--accent); font-family: 'DM Mono', monospace;
+    font-size: 0.72rem; padding: 5px 14px; border-radius: 999px;
+    margin-bottom: 28px; letter-spacing: 0.08em;
+    animation: fadeUp 0.6s ease both;
+  }
+  .hero-tag::before { content: '▸'; }
+  .hero-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 6px;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+  .hero-name span { color: var(--accent); font-style: italic; }
+  .hero-role {
+    font-family: 'DM Mono', monospace;
+    font-size: 1rem; color: var(--muted2);
+    margin-bottom: 28px;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+  .hero-role .cursor {
+    display: inline-block; width: 2px; height: 1em;
+    background: var(--accent); margin-left: 2px;
+    animation: blink 1s infinite;
+    vertical-align: middle;
+  }
+  .hero-bio {
+    font-size: 1.05rem; color: var(--muted2); max-width: 560px;
+    line-height: 1.8; margin-bottom: 40px;
+    animation: fadeUp 0.6s 0.3s ease both;
+  }
+  .hero-bio strong { color: var(--text); font-weight: 500; }
+  .hero-cta {
+    display: flex; gap: 16px; flex-wrap: wrap;
+    animation: fadeUp 0.6s 0.4s ease both;
+  }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 28px; border-radius: 8px;
+    font-size: 0.88rem; font-weight: 500; text-decoration: none;
+    transition: all 0.2s; cursor: pointer; border: none;
+  }
+  .btn-primary {
+    background: var(--accent); color: #000;
+  }
+  .btn-primary:hover { background: #00ffb3; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,229,160,0.3); }
+  .btn-outline {
+    background: transparent; color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+  .hero-stats {
+    display: flex; gap: 40px; margin-top: 64px; padding-top: 40px;
+    border-top: 1px solid var(--border);
+    animation: fadeUp 0.6s 0.5s ease both;
+  }
+  .stat-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.2rem; color: var(--accent); line-height: 1;
+  }
+  .stat-label { font-size: 0.78rem; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+
+  /* ── SECTION WRAPPER ── */
+  .section-wrap { max-width: 1100px; margin: 0 auto; padding: 100px 48px; }
+  .section-label {
+    display: flex; align-items: center; gap: 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem; color: var(--accent);
+    letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    letter-spacing: -0.02em;
+    margin-bottom: 56px;
+  }
+
+  /* ── PROJECTS ── */
+  .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+  .project-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .project-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.3s;
+  }
+  .project-card:hover { border-color: rgba(0,229,160,0.2); transform: translateY(-4px); box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
+  .project-card:hover::before { transform: scaleX(1); }
+  .project-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    background: var(--accent-glow); border: 1px solid rgba(0,229,160,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; margin-bottom: 20px;
+  }
+  .project-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.2rem; margin-bottom: 4px;
+  }
+  .project-subtitle { font-size: 0.78rem; color: var(--accent); font-family: 'DM Mono', monospace; margin-bottom: 14px; }
+  .project-desc { font-size: 0.88rem; color: var(--muted2); line-height: 1.7; margin-bottom: 20px; }
+  .tech-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+  .tech-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem; padding: 3px 10px;
+    border-radius: 4px; background: var(--surface2);
+    border: 1px solid var(--border); color: var(--muted2);
+  }
+  .project-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.8rem; color: var(--accent); text-decoration: none;
+    font-weight: 500; transition: gap 0.2s;
+  }
+  .project-link:hover { gap: 10px; }
+
+  /* ── SKILLS ── */
+  .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .skill-group {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 24px;
+    transition: border-color 0.2s;
+  }
+  .skill-group:hover { border-color: rgba(0,229,160,0.2); }
+  .skill-group-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.1em;
+    margin-bottom: 14px;
+  }
+  .skill-items { display: flex; flex-wrap: wrap; gap: 6px; }
+  .skill-item {
+    font-size: 0.8rem; color: var(--muted2);
+    background: var(--surface2); border: 1px solid var(--border);
+    padding: 4px 10px; border-radius: 6px;
+    transition: all 0.15s;
+  }
+  .skill-item:hover { color: var(--text); border-color: rgba(0,229,160,0.3); }
+
+  /* ── CERTS ── */
+  .certs-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+  .cert-item {
+    display: flex; align-items: flex-start; gap: 14px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px 20px;
+    transition: border-color 0.2s;
+  }
+  .cert-item:hover { border-color: rgba(0,229,160,0.2); }
+  .cert-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent); margin-top: 8px; flex-shrink: 0;
+  }
+  .cert-name { font-size: 0.88rem; font-weight: 500; margin-bottom: 2px; }
+  .cert-date { font-size: 0.75rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+
+  /* ── CONTACT ── */
+  #contact { background: var(--surface); border-top: 1px solid var(--border); }
+  .contact-inner { text-align: center; max-width: 600px; margin: 0 auto; }
+  .contact-inner .section-title { margin-bottom: 16px; }
+  .contact-sub { color: var(--muted2); margin-bottom: 40px; }
+  .contact-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 16px; }
+  .contact-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); text-decoration: none;
+    padding: 12px 20px; border-radius: 10px; font-size: 0.85rem;
+    transition: all 0.2s;
+  }
+  .contact-link:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+  .contact-link svg { width: 16px; height: 16px; fill: currentColor; }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center; padding: 28px 48px;
+    font-size: 0.75rem; color: var(--muted);
+    border-top: 1px solid var(--border);
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
+  .reveal {
+    opacity: 0; transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 768px) {
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    #hero, .section-wrap { padding-left: 24px; padding-right: 24px; }
+    .hero-stats { gap: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="glow-orb g1"></div>
+<div class="glow-orb g2"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">NR</div>
+  <ul class="nav-links">
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#certifications">Certs</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">Available for opportunities</div>
+    <h1 class="hero-name">Naincy<br><span>Rauniyar</span></h1>
+    <div class="hero-role">Backend Engineer &amp; CS Undergrad<span class="cursor"></span></div>
+    <p class="hero-bio">
+      Building <strong>production-grade backend systems</strong> with Java &amp; Spring Boot —
+      from microservices architectures to ML-powered APIs.
+      Currently pursuing B.Tech in CS at <strong>KIIT University</strong> (CGPA 9.16)
+      and actively seeking full-time &amp; internship roles.
+    </p>
+    <div class="hero-cta">
+      <a href="#projects" class="btn btn-primary">View My Work ↓</a>
+      <a href="mailto:naincyrauniyar@gmail.com" class="btn btn-outline">Get In Touch</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-num">3</div>
+        <div class="stat-label">Production Projects</div>
+      </div>
+      <div>
+        <div class="stat-num">500+</div>
+        <div class="stat-label">LeetCode Problems</div>
+      </div>
+      <div>
+        <div class="stat-num">9.16</div>
+        <div class="stat-label">CGPA</div>
+      </div>
+      <div>
+        <div class="stat-num">6</div>
+        <div class="stat-label">Certifications</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-wrap">
+    <div class="section-label">01 — Work</div>
+    <h2 class="section-title">Featured Projects</h2>
+    <div class="projects-grid">
+
+      <div class="project-card reveal">
+        <div class="project-icon">🏦</div>
+        <div class="project-title">Bank Management & Smart Loan Approval</div>
+        <div class="project-subtitle">Secure Banking Backend · ML Integration</div>
+        <p class="project-desc">
+          Secure banking backend with JWT auth and role-based access. RESTful APIs for accounts, transactions, and fund transfers.
+          Integrated ML-based loan approval using Gradient Boosting models exposed as real-time REST APIs.
+        </p>
+        <div class="tech-tags">
+          <span class="tech-tag">Spring Boot</span>
+          <span class="tech-tag">Spring Security</span>
+          <span class="tech-tag">JWT</span>
+          <span class="tech-tag">PostgreSQL</span>
+          <span class="tech-tag">Python</span>
+          <span class="tech-tag">Gradient Boosting</span>
+        </div>
+        <a href="https://github.com/NaincyRauniyar" class="project-link" target="_blank">View on GitHub →</a>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-icon">🚗</div>
+        <div class="project-title">Uber Clone — Ride Booking System</div>
+        <div class="project-subtitle">Microservices · Event-Driven Architecture</div>
+        <p class="project-desc">
+          Scalable ride-booking backend using Spring Boot microservices.
+          Improved throughput with Kafka event-driven comms, cut driver search latency with Redis GeoSpatial queries,
+          and enabled independent service scaling for peak traffic.
+        </p>
+        <div class="tech-tags">
+          <span class="tech-tag">Spring Boot</span>
+          <span class="tech-tag">Kafka</span>
+          <span class="tech-tag">Redis</span>
+          <span class="tech-tag">MySQL</span>
+          <span class="tech-tag">Eureka</span>
+          <span class="tech-tag">WebSocket</span>
+          <span class="tech-tag">Flyway</span>
+        </div>
+        <a href="https://github.com/NaincyRauniyar" class="project-link" target="_blank">View on GitHub →</a>
+      </div>
+
+      <div class="project-card reveal">
+        <div class="project-icon">🛒</div>
+        <div class="project-title">DreamCart — E-Commerce Platform</div>
+        <div class="project-subtitle">Microservices · Clean Architecture</div>
+        <p class="project-desc">
+          Scalable microservices for user, product, cart, and order management.
+          Secured with Spring Security and JWT. Optimized JPA queries for performance,
+          following clean Controller–Service–Repository architecture.
+        </p>
+        <div class="tech-tags">
+          <span class="tech-tag">Spring Boot</span>
+          <span class="tech-tag">Spring Security</span>
+          <span class="tech-tag">MySQL</span>
+          <span class="tech-tag">JPA/Hibernate</span>
+          <span class="tech-tag">REST APIs</span>
+          <span class="tech-tag">Maven</span>
+        </div>
+        <a href="https://github.com/NaincyRauniyar" class="project-link" target="_blank">View on GitHub →</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-wrap">
+    <div class="section-label">02 — Expertise</div>
+    <h2 class="section-title">Skills & Technologies</h2>
+    <div class="skills-grid">
+      <div class="skill-group reveal">
+        <div class="skill-group-title">Languages</div>
+        <div class="skill-items">
+          <span class="skill-item">Java</span>
+          <span class="skill-item">Python</span>
+          <span class="skill-item">C++</span>
+          <span class="skill-item">SQL</span>
+          <span class="skill-item">HTML</span>
+        </div>
+      </div>
+      <div class="skill-group reveal">
+        <div class="skill-group-title">Backend</div>
+        <div class="skill-items">
+          <span class="skill-item">Spring Boot</span>
+          <span class="skill-item">Spring Security</span>
+          <span class="skill-item">REST APIs</span>
+          <span class="skill-item">JPA/Hibernate</span>
+          <span class="skill-item">Kafka</span>
+          <span class="skill-item">Redis</span>
+        </div>
+      </div>
+      <div class="skill-group reveal">
+        <div class="skill-group-title">Databases</div>
+        <div class="skill-items">
+          <span class="skill-item">MySQL</span>
+          <span class="skill-item">PostgreSQL</span>
+          <span class="skill-item">MongoDB</span>
+        </div>
+      </div>
+      <div class="skill-group reveal">
+        <div class="skill-group-title">System Design</div>
+        <div class="skill-items">
+          <span class="skill-item">Microservices</span>
+          <span class="skill-item">LLD</span>
+          <span class="skill-item">HLD</span>
+          <span class="skill-item">SOLID</span>
+          <span class="skill-item">Design Patterns</span>
+        </div>
+      </div>
+      <div class="skill-group reveal">
+        <div class="skill-group-title">Data & ML</div>
+        <div class="skill-items">
+          <span class="skill-item">Pandas</span>
+          <span class="skill-item">NumPy</span>
+          <span class="skill-item">Matplotlib</span>
+          <span class="skill-item">Machine Learning</span>
+          <span class="skill-item">Jupyter</span>
+        </div>
+      </div>
+      <div class="skill-group reveal">
+        <div class="skill-group-title">Tools & Concepts</div>
+        <div class="skill-items">
+          <span class="skill-item">Git</span>
+          <span class="skill-item">Postman</span>
+          <span class="skill-item">Linux</span>
+          <span class="skill-item">DSA</span>
+          <span class="skill-item">DBMS</span>
+          <span class="skill-item">OS</span>
+          <span class="skill-item">Computer Networks</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CERTIFICATIONS -->
+<section id="certifications">
+  <div class="section-wrap">
+    <div class="section-label">03 — Credentials</div>
+    <h2 class="section-title">Certifications</h2>
+    <div class="certs-list">
+      <div class="cert-item reveal">
+        <div class="cert-dot"></div>
+        <div>
+          <div class="cert-name">Red Hat Certified: System Administration I (RH124)</div>
+          <div class="cert-date">March 2025</div>
+        </div>
+      </div>
+      <div class="cert-item reveal">
+        <div class="cert-dot"></div>
+        <div>
+          <div class="cert-name">Databases and SQL for Data Science with Python</div>
+          <div class="cert-date">April 2025</div>
+        </div>
+      </div>
+      <div class="cert-item reveal">
+        <div class="cert-dot"></div>
+        <div>
+          <div class="cert-name">Advanced Software Engineering Simulation — Walmart</div>
+          <div class="cert-date">May 2025</div>
+        </div>
+      </div>
+      <div class="cert-item reveal">
+        <div class="cert-dot"></div>
+        <div>
+          <div class="cert-name">Software Engineering Simulation — JPMorgan Chase & Co.</div>
+          <div class="cert-date">June 2025</div>
+        </div>
+      </div>
+      <div class="cert-item reveal">
+        <div class="cert-dot"></div>
+        <div>
+          <div class="cert-name">Cisco Networking Basics</div>
+          <div class="cert-date">September 2025</div>
+        </div>
+      </div>
+      <div class="cert-item reveal">
+        <div class="cert-dot"></div>
+        <div>
+          <div class="cert-name">Oracle Cloud Infrastructure Developer</div>
+          <div class="cert-date">October 2025</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-wrap">
+    <div class="contact-inner">
+      <div class="section-label" style="justify-content:center;">04 — Contact</div>
+      <h2 class="section-title">Let's Connect</h2>
+      <p class="contact-sub">Open to internships, full-time backend roles, and interesting collaborations. Based in Muzaffarpur, Bihar, India.</p>
+      <div class="contact-links">
+        <a href="mailto:naincyrauniyar@gmail.com" class="contact-link">
+          <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          naincyrauniyar@gmail.com
+        </a>
+        <a href="https://github.com/NaincyRauniyar" class="contact-link" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/></svg>
+          NaincyRauniyar
+        </a>
+        <a href="https://linkedin.com/in/naincy-rauniyar" class="contact-link" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+          LinkedIn
+        </a>
+        <a href="https://leetcode.com/u/NANCYR/" class="contact-link" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M13.483 0a1.374 1.374 0 0 0-.961.438L7.116 6.226l-3.854 4.126a5.266 5.266 0 0 0-1.209 2.104 5.35 5.35 0 0 0-.125.513 5.527 5.527 0 0 0 .062 2.362 5.83 5.83 0 0 0 .349 1.017 5.938 5.938 0 0 0 1.271 1.818l4.277 4.193.039.038c2.248 2.165 5.852 2.133 8.063-.074l2.396-2.392c.54-.54.54-1.414.003-1.955a1.378 1.378 0 0 0-1.951-.003l-2.396 2.392a3.021 3.021 0 0 1-4.205.038l-.02-.019-4.276-4.193c-.652-.64-.972-1.469-.948-2.263a2.68 2.68 0 0 1 .066-.523 2.545 2.545 0 0 1 .619-1.164L9.13 8.114c1.058-1.134 3.204-1.27 4.43-.278l3.501 2.831c.593.48 1.461.387 1.94-.207a1.384 1.384 0 0 0-.207-1.943l-3.5-2.831c-.8-.647-1.766-1.045-2.774-1.202l2.015-2.158A1.384 1.384 0 0 0 13.483 0zm-2.866 12.815a1.38 1.38 0 0 0-1.38 1.382 1.38 1.38 0 0 0 1.38 1.382H20.79a1.38 1.38 0 0 0 1.38-1.382 1.38 1.38 0 0 0-1.38-1.382z"/></svg>
+          LeetCode
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Built with ♥ · Naincy Rauniyar · 2025
+</footer>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Typing effect for role
+  const roles = ['Backend Engineer', 'Java Developer', 'Microservices Architect', 'CS Undergrad @ KIIT'];
+  let ri = 0, ci = 0, deleting = false;
+  const roleEl = document.querySelector('.hero-role');
+  function type() {
+    const current = roles[ri];
+    if (!deleting) {
+      roleEl.innerHTML = current.slice(0, ++ci) + '<span class="cursor"></span>';
+      if (ci === current.length) { deleting = true; setTimeout(type, 2000); return; }
+    } else {
+      roleEl.innerHTML = current.slice(0, --ci) + '<span class="cursor"></span>';
+      if (ci === 0) { deleting = false; ri = (ri + 1) % roles.length; }
+    }
+    setTimeout(type, deleting ? 40 : 80);
+  }
+  type();
+</script>
+</body>
+</html>
